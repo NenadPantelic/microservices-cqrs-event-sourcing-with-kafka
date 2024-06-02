@@ -1,0 +1,40 @@
+server:
+  port: 5001
+
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    # if the database does not exist, it will be created
+    url: jdbc:mysql://localhost:3306/bank-account?createDatabaseIfNotExist=true
+    username: root
+    password: techbank123
+  kafka:
+    listener:
+      # manually update the offset
+      ack-mode: MANUAL_IMMEDIATE
+    consumer:
+      bootstrap-servers: localhost:9092
+      # multiple consumers with the same group id share the same offset - they will together consume those messages, but
+      # not the same one, but some messages will be processed by first one and others by the second one
+      # we have two consumer with the same group id and 5 messages
+      # the first consumer process messages 1, 2 and 3, and we stop it
+      # we start the other consumer with the same group id will process messages 4 and 5
+
+      # multiple consumers with different group id will process exactly the same messages
+      # we have two consumer with different group ids and 5 messages
+      # the first consumer process messages 1, 2, 3, 4 and 5
+      # the other consumer will process messages 1, 2, 3, 4 and 5
+      group-id: bankacc-consumer
+      auto-offset-reset:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              # every object is trusted to be deserialized
+              packages: '*'

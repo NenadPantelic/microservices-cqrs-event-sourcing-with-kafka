@@ -1,0 +1,52 @@
+version: "3.4"
+
+services:
+  zk:
+    image: confluentinc/cp-zookeeper:7.3.2
+    hostname: zk
+    container_name: zk
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper_data:/app_data"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zk:2888:3888
+
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    # no: Containers won’t restart automatically.
+    # on-failure[:max-retries]: Restart the container if it exits with a non-zero exit code, and provide a maximum number 
+    # of attempts for the Docker daemon to restart the container.
+    # always: Always restart the container if it stops. -> always restart if the container stops running. However, if we 
+    # explicitly stop the container, the restart policy will only take effect when the Docker daemon restarts, or when we 
+    # use the restart command.
+    # unless-stopped: Always restart the container unless it was stopped arbitrarily, or by the Docker daemon.
+
+    restart: always
+    volumes:
+      - "kafka_data:/app_data"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zk:2181"
+    depends_on:
+      - zk
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+
+networks:
+  default:
+    external:
+      name: techbank-net
