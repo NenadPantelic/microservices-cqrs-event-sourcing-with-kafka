@@ -3,14 +3,23 @@ server:
 
 spring:
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    # MySQL settings
+    #    database-platform: org.hibernate.dialect.MySQL8Dialect
+    #    show-sql: true
+    #    hibernate:
+    #      ddl-auto: update
+    # PostgreSQL settings
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     show-sql: true
     hibernate:
       ddl-auto: update
   datasource:
     # if the database does not exist, it will be created
-    url: jdbc:mysql://localhost:3306/bank-account?createDatabaseIfNotExist=true
-    username: root
+    # MySQL
+    #    url: jdbc:mysql://localhost:3306/bank-account?createDatabaseIfNotExist=true
+    # PostgreSQL
+    url: jdbc:postgresql://localhost:5432/bank-account
+    username: postgres
     password: techbank123
   kafka:
     listener:

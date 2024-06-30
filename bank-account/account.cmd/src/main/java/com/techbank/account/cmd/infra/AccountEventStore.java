@@ -9,6 +9,7 @@ import com.techbank.cqrs.core.exception.ConcurrencyException;
 import com.techbank.cqrs.core.infra.EventStore;
 import com.techbank.cqrs.core.producer.EventProducer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -65,5 +66,20 @@ public class AccountEventStore implements EventStore {
         return eventStream.stream()
                 .map(EventModel::getEventData)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAggregateIds() {
+        log.info("Get aggregate ids");
+        var eventStream = eventStoreRepository.findAll();
+        if (eventStream.isEmpty()) {
+            throw new IllegalStateException("Could not retrieve an event stream from the event store!");
+        }
+
+        return eventStream.stream()
+                .map(EventModel::getAggregateIdentifier)
+                .distinct()
+                .collect(Collectors.toList());
+
     }
 }

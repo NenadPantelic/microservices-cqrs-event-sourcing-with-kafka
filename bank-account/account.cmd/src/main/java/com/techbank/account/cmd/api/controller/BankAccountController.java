@@ -1,4 +1,4 @@
-package com.techbank.account.cmd.api;
+package com.techbank.account.cmd.api.controller;
 
 import com.techbank.account.cmd.api.command.CloseAccountCommand;
 import com.techbank.account.cmd.api.command.DepositFundsCommand;
@@ -127,4 +127,6 @@ public class BankAccountController {
             );
         }
     }
+
+
 }
